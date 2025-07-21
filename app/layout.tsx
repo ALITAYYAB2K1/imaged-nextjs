@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
@@ -17,7 +17,10 @@ export const metadata: Metadata = {
   title: "Imagater",
   description: "AI Image Editor",
 };
-
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -25,16 +28,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${inter.className}`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          {/* <Header />*/}
+          <main className="bg-slate-900 min-h-screen text-white overflow-x-hidden">
+            {children}
+          </main>
         </ThemeProvider>
       </body>
     </html>
