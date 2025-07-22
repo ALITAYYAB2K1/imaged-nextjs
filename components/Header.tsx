@@ -12,6 +12,7 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { Button } from "./ui/button";
+import { useStoreUserEffect } from "@/hooks/useStoreUserEffect";
 function Header() {
   const path = usePathname();
   return (
