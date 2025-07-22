@@ -3,6 +3,15 @@ import Link from "next/link";
 import Image from "next/image";
 import React from "react";
 import { usePathname } from "next/navigation";
+import {
+  ClerkProvider,
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
+import { Button } from "./ui/button";
 function Header() {
   const path = usePathname();
   return (
@@ -47,9 +56,19 @@ function Header() {
         )}
         <div
           className="text-white font-medium transition-all duration-300 hover:text-cyan-400
-                cursor-pointer hover:offset-y-2 hover:scale-125 flex items-center gap-3 ml-10 md:ml-20"
+                cursor-pointer  flex items-center gap-3 ml-10 md:ml-20"
         >
-          auth
+          <SignedOut>
+            <SignInButton>
+              <Button variant="glass">Sign In</Button>
+            </SignInButton>
+            <SignUpButton>
+              <Button variant="primary">Sign Up</Button>
+            </SignUpButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
         </div>
       </div>
     </header>

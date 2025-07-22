@@ -23,7 +23,7 @@ const buttonVariants = cva(
         primary:
           "bg-gradient-to-r from-blue-500 to-purple-600 text-white border-transparent shadow-xs hover:from-blue-600 hover:to-purple-600 focus-visible:ring-blue-500/20 dark:focus-visible:ring-blue-400/40 hover:cursor-pointer hover:transform hover:scale-105",
         glass:
-          "backdrop-blur-lg bg-white/10 text-white border-white/20 hover:transform hover:scale-105",
+          "backdrop-blur-lg bg-white/10 text-white border-white/20 hover:transform hover:scale-105 cursor-pointer",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
