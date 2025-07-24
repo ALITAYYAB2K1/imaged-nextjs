@@ -30,6 +30,18 @@ function FloatingShapes() {
       position: "bottom-1/3 right-1/4",
       gradient: "from-green-400 to-cyan-500",
     },
+    {
+      id: 5,
+      size: "w-56 h-56",
+      position: "top-1/14 left-1/2",
+      gradient: "from-yellow-400 to-orange-500",
+    },
+    {
+      id: 6,
+      size: "w-48 h-48",
+      position: "bottom-1/4 right-1/2",
+      gradient: "from-red-400 to-yellow-500",
+    },
   ];
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden">

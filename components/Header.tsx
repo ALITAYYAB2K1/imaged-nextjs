@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import React from "react";
 import { usePathname } from "next/navigation";
+import { BarLoader } from "react-spinners";
 import {
   ClerkProvider,
   SignInButton,
@@ -13,8 +14,12 @@ import {
 } from "@clerk/nextjs";
 import { Button } from "./ui/button";
 import { useStoreUserEffect } from "@/hooks/useStoreUserEffect";
+import { Unauthenticated, Authenticated } from "convex/react";
+
 function Header() {
   const path = usePathname();
+  const { isLoading, isAuthenticated } = useStoreUserEffect();
+  if (path.includes("/editor")) return null; // header hidden in editor
   return (
     <header className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 text-nowrap">
       <div
@@ -59,18 +64,23 @@ function Header() {
           className="text-white font-medium transition-all duration-300 hover:text-cyan-400
                 cursor-pointer  flex items-center gap-3 ml-10 md:ml-20"
         >
-          <SignedOut>
+          <Unauthenticated>
             <SignInButton>
               <Button variant="glass">Sign In</Button>
             </SignInButton>
             <SignUpButton>
               <Button variant="primary">Sign Up</Button>
             </SignUpButton>
-          </SignedOut>
-          <SignedIn>
+          </Unauthenticated>
+          <Authenticated>
             <UserButton />
-          </SignedIn>
+          </Authenticated>
         </div>
+        {isLoading && (
+          <div className="fixed bottom-0 left-0 w-full z-40 flex justify-center">
+            <BarLoader width={"94%"} color="#06b6d4" />
+          </div>
+        )}
       </div>
     </header>
   );
