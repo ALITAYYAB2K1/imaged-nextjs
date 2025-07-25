@@ -15,6 +15,7 @@ import {
 import { Button } from "./ui/button";
 import { useStoreUserEffect } from "@/hooks/useStoreUserEffect";
 import { Unauthenticated, Authenticated } from "convex/react";
+import { LayoutDashboard } from "lucide-react";
 
 function Header() {
   const path = usePathname();
@@ -73,6 +74,12 @@ function Header() {
             </SignUpButton>
           </Unauthenticated>
           <Authenticated>
+            <Link href="/dashboard">
+              <Button variant="glass" className="hidden sm:flex">
+                <LayoutDashboard className="h-4 w-4" />
+                <span className="hidden md:flex">Dashboard</span>
+              </Button>
+            </Link>
             <UserButton />
           </Authenticated>
         </div>
