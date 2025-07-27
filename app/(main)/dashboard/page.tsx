@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Sparkles } from "lucide-react";
 import { BarLoader } from "react-spinners";
 import type { Doc } from "@/convex/_generated/dataModel";
+import NewProjectModel from "./_components/new-project-model";
 
 function Dashboard() {
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
@@ -63,7 +64,10 @@ function Dashboard() {
             </Button>
           </div>
         )}
-        {/* <NewProjectModel /> */}
+        <NewProjectModel
+          isOpen={showNewProjectModal}
+          onClose={() => setShowNewProjectModal(false)}
+        />
       </div>
     </div>
   );
