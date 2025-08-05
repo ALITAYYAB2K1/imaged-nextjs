@@ -13,11 +13,21 @@ import { usePlanAccess } from "@/hooks/use-plan-access";
 import useConvexQuerry, { useConvexMutation } from "@/hooks/use-querry-hook";
 import React, { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Crown, Loader2, Terminal, Upload } from "lucide-react";
+import {
+  Crown,
+  ImageIcon,
+  Loader2,
+  Terminal,
+  Trash,
+  Upload,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDropzone } from "react-dropzone";
 import Image from "next/image";
 import type { Doc } from "@/convex/_generated/dataModel";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 interface NewProjectModelProps {
   isOpen: boolean;
@@ -29,7 +39,12 @@ function NewProjectModel({ isOpen, onClose }: NewProjectModelProps) {
   const [projectTitle, setProjectTitle] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const handleClose = () => {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setProjectTitle("");
+    setIsUploading(false);
     onClose();
   };
 
@@ -40,8 +55,39 @@ function NewProjectModel({ isOpen, onClose }: NewProjectModelProps) {
   const currentProjectCount = projects?.length || 0;
   const canCreate = canCreateProject(currentProjectCount);
   const { mutate: createProject } = useConvexMutation(api.projects.create);
-  const onDrop = () => {};
-  const handleCreateProject = () => {};
+  const onDrop = (acceptedFiles) => {
+    const file = acceptedFiles[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file)); // Create a preview URL for the image
+      const nameWithoutExtension = file.name.replace(/\.[^/.]+$/, "");
+      setProjectTitle(nameWithoutExtension || "Untitled Project"); // Set the project title to the file name without extension
+    } else {
+      setSelectedFile(null);
+      setPreviewUrl(null);
+    }
+  };
+  const handleCreateProject = async () => {
+    if (!canCreate) {
+      setShowUpgradeModal(true);
+      return;
+    }
+    if (!selectedFile || !projectTitle.trim()) {
+      toast.error("Please select an image and enter a project title.");
+      return;
+    }
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      formData.append("filename", selectedFile.name);
+      formData.append("title", projectTitle);
+
+      await createProject(formData);
+      toast.success("Project created successfully!");
+      handleClose();
+    } catch (error) {}
+  };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -109,16 +155,56 @@ function NewProjectModel({ isOpen, onClose }: NewProjectModelProps) {
                 </p>
               </div>
             ) : (
-              <div>
-                {previewUrl && (
-                  <Image
-                    src={previewUrl}
-                    alt="Preview"
-                    width={400}
-                    height={300}
-                    className="w-full max-w-md mx-auto rounded-lg object-cover"
+              <div className="space-y-6">
+                <div className="relative">
+                  {previewUrl && (
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
+                      className="w-full h-64 object-cover rounded-xl border border-white/10"
+                    />
+                  )}
+                  <Button
+                    variant={"ghost"}
+                    size={"icon"}
+                    onClick={() => {
+                      setSelectedFile(null);
+                      setPreviewUrl(null);
+                      setProjectTitle("");
+                    }}
+                    className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-red-100 cursor-pointer"
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="project-title"
+                    className="text-white font-semibold"
+                  >
+                    Project Title
+                  </Label>
+                  <Input
+                    id="project-title"
+                    type="text"
+                    value={projectTitle}
+                    onChange={(e) => setProjectTitle(e.target.value)}
+                    placeholder="Enter project title...."
+                    className="bg-transparent border border-white/20 focus:border-white focus:ring-0"
                   />
-                )}
+                </div>
+
+                <div className="bg-slate-700/50 rounded-lg p-4">
+                  <div className="flex items-center gap-3 ">
+                    <ImageIcon className="h-5 w-5 text-cyan-400" />
+                    <div>
+                      <p className="text-white font-medium">
+                        {selectedFile?.name}
+                      </p>
+                      <p>{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
