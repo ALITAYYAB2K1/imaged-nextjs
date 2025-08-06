@@ -28,6 +28,7 @@ import type { Doc } from "@/convex/_generated/dataModel";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface NewProjectModelProps {
   isOpen: boolean;
@@ -40,6 +41,7 @@ function NewProjectModel({ isOpen, onClose }: NewProjectModelProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const router = useRouter();
   const handleClose = () => {
     setSelectedFile(null);
     setPreviewUrl(null);
@@ -55,7 +57,7 @@ function NewProjectModel({ isOpen, onClose }: NewProjectModelProps) {
   const currentProjectCount = projects?.length || 0;
   const canCreate = canCreateProject(currentProjectCount);
   const { mutate: createProject } = useConvexMutation(api.projects.create);
-  const onDrop = (acceptedFiles) => {
+  const onDrop = (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
       setSelectedFile(file);
@@ -81,12 +83,31 @@ function NewProjectModel({ isOpen, onClose }: NewProjectModelProps) {
       const formData = new FormData();
       formData.append("file", selectedFile);
       formData.append("filename", selectedFile.name);
-      formData.append("title", projectTitle);
-
-      await createProject(formData);
+      const uploadResponse = await fetch("/api/imagekit/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const uploadData = await uploadResponse.json();
+      if (!uploadResponse.ok) {
+        throw new Error(uploadData.error || "Failed to upload image");
+      }
+      const projectId = await createProject({
+        title: projectTitle.trim(),
+        originalImageUrl: uploadData.url,
+        currentImageUrl: uploadData.url,
+        thumbnailUrl: uploadData.thumbnailUrl,
+        width: uploadData.width,
+        height: uploadData.height,
+        canvasState: null, // Assuming canvasState is not needed for new projects
+      });
       toast.success("Project created successfully!");
-      handleClose();
-    } catch (error) {}
+      router.push(`/editor/${projectId}`);
+    } catch (error) {
+      console.error("Error creating project:", error);
+      toast.error("Failed to create project");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
