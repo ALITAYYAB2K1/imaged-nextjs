@@ -29,6 +29,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import UpgradeModal from "@/components/UpgradeModal";
 
 interface NewProjectModelProps {
   isOpen: boolean;
@@ -257,6 +258,13 @@ function NewProjectModel({ isOpen, onClose }: NewProjectModelProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        restrictedTool="projects"
+        reason="You have reached the project limit on the free plan. Upgrade to Imaged Pro for unlimited projects."
+      />
     </>
   );
 }
