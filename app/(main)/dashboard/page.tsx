@@ -9,6 +9,7 @@ import { Plus, Sparkles } from "lucide-react";
 import { BarLoader } from "react-spinners";
 import type { Doc } from "@/convex/_generated/dataModel";
 import NewProjectModel from "./_components/new-project-model";
+import ProjectGrid from "./_components/project-grid";
 
 function Dashboard() {
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
@@ -44,7 +45,7 @@ function Dashboard() {
         {isLoading ? (
           <BarLoader width={"100%"} color="white" className="mx-auto" />
         ) : projects && projects.length > 0 ? (
-          <></>
+          <ProjectGrid projects={projects} />
         ) : (
           <div className="text-center mt-16">
             <h3 className="text-center text-white/70 text-2xl font-semibold mb-3">
