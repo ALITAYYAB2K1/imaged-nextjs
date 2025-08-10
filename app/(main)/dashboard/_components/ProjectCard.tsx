@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import {
   Card,
@@ -14,11 +13,22 @@ import { Badge, Edit, Trash2 } from "lucide-react";
 import { useConvexMutation } from "@/hooks/use-querry-hook";
 import { api } from "@/convex/_generated/api";
 import { formatDistanceToNow } from "date-fns";
+import { toast } from "sonner";
 export default function ProjectCard({ project, onEdit }) {
   const { mutate: deleteProject, isLoading } = useConvexMutation(
     api.projects.deleteProject
   );
-  const handleDelete = async () => {};
+  const handleDelete = async () => {
+    if (window.confirm("Are you sure you want to delete this project?")) {
+      try {
+        await deleteProject({ projectId: project._id });
+        toast.success("Project deleted successfully");
+      } catch (error) {
+        console.error("Error deleting project:", error);
+        toast.error("Failed to delete project");
+      }
+    }
+  };
   const lastUpdated = formatDistanceToNow(new Date(project.updatedAt), {
     addSuffix: true,
   });
@@ -35,12 +45,12 @@ export default function ProjectCard({ project, onEdit }) {
             className="w-full h-full object-cover "
           />
         )}
-        <div>
+        <div className="absolute inset-0 bg-black/30 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <Button
             onClick={onEdit}
             variant={"glass"}
             size={"sm"}
-            className="gap-2"
+            className="gap-2 cursor-pointer"
           >
             <Edit className="h-4 w-4" />
             Edit
@@ -49,8 +59,7 @@ export default function ProjectCard({ project, onEdit }) {
             onClick={handleDelete}
             variant={"glass"}
             size={"sm"}
-            className="gap-2 text-red-400 hover:text-red-300"
-            disabled={isLoading}
+            className="gap-2 text-red-400 hover:text-red-300 cursor-pointer"
           >
             <Trash2 className="h-4 w-4" />
             Delete
