@@ -91,3 +91,76 @@ export const deleteProject = mutation({
     return { success: true, message: "Project deleted successfully" };
   },
 });
+
+export const getProject = query({
+  args: { projectId: v.id("projects") },
+  handler: async (ctx, args): Promise<Doc<"projects"> | null> => {
+    const user: Doc<"users"> = await ctx.runQuery(
+      internal.users.getCurrentUserInternal
+    );
+    const project: Doc<"projects"> | null = await ctx.db.get(args.projectId);
+
+    if (!project) {
+      throw new Error("Project not found");
+    }
+    if (!user || project.userId !== user._id) {
+      throw new Error("You do not have permission to view this project");
+    }
+
+    return project;
+  },
+});
+
+export const updateProject = mutation({
+  args: {
+    projectId: v.id("projects"),
+    canvasState: v.optional(v.any()),
+    width: v.optional(v.number()),
+    height: v.optional(v.number()),
+    currentImageUrl: v.optional(v.string()),
+    thumbnailUrl: v.optional(v.string()),
+    activeTransformation: v.optional(v.string()),
+    backgroundRemoved: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args): Promise<void> => {
+    const user: Doc<"users"> = await ctx.runQuery(
+      internal.users.getCurrentUserInternal
+    );
+    const project: Doc<"projects"> | null = await ctx.db.get(args.projectId);
+
+    if (!project) {
+      throw new Error("Project not found");
+    }
+    if (!user || project.userId !== user._id) {
+      throw new Error("You do not have permission to update this project");
+    }
+    // Collect only the provided fields to patch; always update the timestamp.
+    const updateData: Partial<Doc<"projects">> = {
+      updatedAt: Date.now(),
+    };
+    if (args.canvasState !== undefined) {
+      updateData.canvasState = args.canvasState;
+    }
+    if (args.width !== undefined) {
+      updateData.width = args.width;
+    }
+    if (args.height !== undefined) {
+      updateData.height = args.height;
+    }
+    if (args.currentImageUrl !== undefined) {
+      updateData.currentImageUrl = args.currentImageUrl;
+    }
+    if (args.thumbnailUrl !== undefined) {
+      updateData.thumbnailUrl = args.thumbnailUrl;
+    }
+    if (args.activeTransformation !== undefined) {
+      updateData.activeTransformation = args.activeTransformation;
+    }
+    if (args.backgroundRemoved !== undefined) {
+      updateData.backgroundRemoved = args.backgroundRemoved;
+    }
+
+    await ctx.db.patch(args.projectId, updateData);
+    return args.projectId;
+  },
+});
