@@ -6,7 +6,7 @@ import { Loader2, Monitor } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { RingLoader } from "react-spinners";
-
+import CanvasEditor from "./_components/canvas";
 const Editor = () => {
   const params = useParams();
   const projectId = params.projectId;
@@ -69,8 +69,8 @@ const Editor = () => {
           </p>
         </div>
       </div>
-      <div className="hidden lg:block min-h-screen bg-slate-900 p-8">
-        <div>
+      <div className="hidden lg:block min-h-screen bg-slate-900 p-0">
+        <div className="flex flex-col h-screen">
           {processingMessage && (
             <div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center">
               <div className="rounded-lg p-6 flex flex-col items-center gap-4">
@@ -85,9 +85,11 @@ const Editor = () => {
             </div>
           )}
           {/* TopBar */}
-          <div>
+          <div className="flex flex-1 overflow-hidden">
             {/* SideBar */}
-            <div>{/* Canvas */}</div>
+            <div className="flex-1 bg-slate-800">
+              <CanvasEditor project={project} />
+            </div>
           </div>
         </div>
       </div>
